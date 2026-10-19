@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Model;
 
+
+#[Hidden(['senha_funcionario'])]
 class Funcionario extends Model
 {
     protected $fillable = [
