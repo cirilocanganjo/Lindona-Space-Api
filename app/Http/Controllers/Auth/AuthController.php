@@ -41,6 +41,7 @@ class AuthController extends Controller
         $user = User::query()
             ->where('cliente_id', $cliente->id)
             ->first();
+    
     } else {
         return response()->json([
             'message' => 'Credenciais inválidas, tente novamente.'
@@ -57,8 +58,12 @@ class AuthController extends Controller
 
     return response()->json([
         'access_token' => $token,
-        'token_type' => 'bearer',
-        'user' => $user->cliente ? $user->cliente : $user->funcionario,
+        'token_type' => 'bearer',        
+        'user' => [
+            'isClient' => $user->cliente_id ? true : false,
+            'isEmployee' => $user->funcionario_id ? true : false,
+            'authenticatedUser' => $user->cliente ? $user->cliente : $user->funcionario,
+        ]
     ]);
 }
 
