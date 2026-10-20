@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
+use App\Http\Requests\ClientCreateAccountRequest;
 use App\Models\Cliente;
 use App\Models\Funcionario;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use \Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -66,6 +68,47 @@ class AuthController extends Controller
         ]
     ]);
 }
+
+
+public function register (ClientCreateAccountRequest $request): JsonResponse
+{
+  if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+    $photo = $request->file('photo');
+    $photo_name = Str::uuid() . '.' . $photo->extension();
+    $photo->storeAs('img', $photo_name, 'public');
+    }
+
+    DB::transaction(function () use ($request, $photo_name) {
+        $cliente = Cliente::create([
+            'nome_cliente' => $request->input('name'),
+            'email_cliente' => $request->input('email'),
+            'telefone_cliente' => $request->input('phone'),
+            'senha_cliente' => Hash::make($request->input('password')),
+            'profile_photo' => $photo_name ?? null,
+        ]);
+
+        User::create([
+            'cliente_id' => $cliente->id,
+            'profile_photo' => $photo_name ?? null,
+        ]);
+    });
+
+
+    return response()->json([
+        'message' => 'A sua conta foi criada com sucesso, faça login para continuar.'
+    ], 201);
+}
+
+public function logout(Request $request): JsonResponse
+{
+    auth('api')->logout();
+
+    return response()->json([
+        'message' => 'Logout realizado com sucesso.'
+    ]);
+
+}
+
 
 }
 
