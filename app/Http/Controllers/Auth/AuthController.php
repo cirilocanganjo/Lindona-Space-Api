@@ -11,6 +11,7 @@ use App\Models\User;
 use Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use \Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -70,12 +71,14 @@ class AuthController extends Controller
 }
 
 
-public function register (ClientCreateAccountRequest $request): JsonResponse
+public function register(ClientCreateAccountRequest $request): JsonResponse
 {
-  if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-    $photo = $request->file('photo');
-    $photo_name = Str::uuid() . '.' . $photo->extension();
-    $photo->storeAs('img', $photo_name, 'public');
+    $photo_name = null;
+
+    if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+        $photo = $request->file('photo');
+        $photo_name = Str::uuid() . '.' . $photo->extension();
+        $photo->storeAs('img', $photo_name, 'public');
     }
 
     DB::transaction(function () use ($request, $photo_name) {
@@ -84,18 +87,16 @@ public function register (ClientCreateAccountRequest $request): JsonResponse
             'email_cliente' => $request->input('email'),
             'telefone_cliente' => $request->input('phone'),
             'senha_cliente' => Hash::make($request->input('password')),
-            'profile_photo' => $photo_name ?? null,
         ]);
 
         User::create([
             'cliente_id' => $cliente->id,
-            'profile_photo' => $photo_name ?? null,
+            'profile_photo' => $photo_name,
         ]);
     });
 
-
     return response()->json([
-        'message' => 'A sua conta foi criada com sucesso, faça login para continuar.'
+        'message' => 'A sua conta foi criada com sucesso, faça login para continuar.',
     ], 201);
 }
 
