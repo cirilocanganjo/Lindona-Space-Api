@@ -110,6 +110,15 @@ public function logout(Request $request): JsonResponse
 
 }
 
+public function getAuthenticatedUser ():JsonResponse
+{
+    $user = auth()->user()->load('cliente');
+
+    return response()->json([
+        'data' => $user
+    ]);
+}
+
 
 }
 
