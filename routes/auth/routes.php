@@ -11,7 +11,7 @@ Route::group(['prefix' => 'auth'], function () {
     
     
     Route::middleware(['auth:api'])->group(function () {
-        Route::get('/user', [\App\Http\Controllers\Auth\AuthController::class, 'getAuthenticatedUser']);
+        Route::post('/user', [\App\Http\Controllers\Auth\AuthController::class, 'getAuthenticatedUser']);
     });
 });
 
