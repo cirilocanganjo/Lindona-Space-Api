@@ -11,7 +11,8 @@ Route::group(['prefix' => 'auth'], function () {
     
     
     Route::middleware(['auth:api'])->group(function () {
-        Route::post('/user', [\App\Http\Controllers\Auth\AuthController::class, 'getAuthenticatedUser']);
+        Route::get('/user', [\App\Http\Controllers\Auth\AuthController::class, 'getAuthenticatedUser']);
+        Route::put('/user', [\App\Http\Controllers\Auth\AuthController::class, 'updateAuthenticatedUser']);
     });
 });
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
 use App\Http\Requests\ClientCreateAccountRequest;
+use App\Http\Requests\UpdateAuthenticatedUserRequest;
 use App\Models\Cliente;
 use App\Models\Funcionario;
 use App\Models\User;
@@ -12,6 +13,7 @@ use Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use \Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -118,6 +120,69 @@ public function getAuthenticatedUser ():JsonResponse
         'data' => $user
     ]);
 }
+
+
+
+
+public function updateAuthenticatedUser(UpdateAuthenticatedUserRequest $request): JsonResponse
+{
+    $user = auth('api')->user()->load('cliente');
+    $cliente = $user->cliente;
+    $validated = $request->validated();
+
+    $oldPhoto = $user->profile_photo;
+    $newPhoto = null;
+
+    if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+        $photo = $request->file('photo');
+        $newPhoto = Str::uuid() . '.' . $photo->extension();
+        $photo->storeAs('img', $newPhoto, 'public');
+    }
+
+    try {
+        DB::transaction(function () use ($cliente, $user, $validated, $newPhoto) {
+            $cliente->update([
+                'nome_cliente' => $validated['name'],
+                'email_cliente' => $validated['email'],
+                'telefone_cliente' => $validated['phone'],
+                ...(!empty($validated['password']) ? [
+                    'senha_cliente' => Hash::make($validated['password']),
+                ] : []),
+            ]);
+
+            if ($newPhoto !== null) {
+                $user->update([
+                    'profile_photo' => $newPhoto,
+                ]);
+            }
+        });
+    } catch (\Throwable $exception) {
+        if ($newPhoto !== null) {
+            Storage::disk('public')->delete('img/' . $newPhoto);
+        }
+
+        throw $exception;
+    }
+
+    if ($newPhoto !== null && $oldPhoto) {
+        Storage::disk('public')->delete('img/' . $oldPhoto);
+    }
+
+    $cliente->refresh();
+
+    return response()->json([
+        'message' => 'Os seus dados foram atualizados com sucesso.',
+        'data' => [
+            'name' => $cliente->nome_cliente,
+            'email' => $cliente->email_cliente,
+            'phone' => $cliente->telefone_cliente,
+            'profile_photo' => $user->fresh()->profile_photo,
+        ],
+    ]);
+}
+
+
+
 
 
 }
