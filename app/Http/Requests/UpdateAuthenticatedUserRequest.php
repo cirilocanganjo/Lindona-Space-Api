@@ -39,8 +39,8 @@ class UpdateAuthenticatedUserRequest extends FormRequest
                 'max:20',
                 Rule::unique('clientes', 'telefone_cliente')->ignore($user->cliente->id),
             ],
-            'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required|same:password',
+            'password' => 'nullable|string|min:6',
+            'password_confirmation' => 'nullable|required_with:password|same:password',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
         ];
     }
@@ -50,16 +50,19 @@ class UpdateAuthenticatedUserRequest extends FormRequest
     {
          return [
             'name.required' => 'O campo de nome é obrigatório.',
+            
             'email.required' => 'O campo de email é obrigatório.',
             'email.email' => 'O campo de email deve ser um endereço de email válido.',
             'email.unique' => 'Este email já está em uso.',
+            
             'phone.required' => 'O campo de telefone é obrigatório.',
             'phone.unique' => 'Este telefone já está em uso.',
-            'password.required' => 'O campo de senha é obrigatório.',
+            
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
-            'password.confirmed' => 'A confirmação da senha não corresponde.',
-            'password_confirmation.required' => 'O campo de confirmação de senha é obrigatório.',
+            'password.string' => 'A senha deve ser um texto válido.',
+            'password_confirmation.required_with' => 'Confirme a nova senha.',
             'password_confirmation.same' => 'A confirmação da senha não corresponde.',
+            
             'photo.image' => 'O arquivo enviado deve ser uma imagem.',
             'photo.mimes' => 'A imagem deve estar no formato jpeg, png, jpg ou gif.',
             'photo.max' => 'A imagem não pode ter mais de 5MB.',
