@@ -41,7 +41,7 @@ class UpdateAuthenticatedUserRequest extends FormRequest
             ],
             'password' => 'nullable|string|min:6',
             'password_confirmation' => 'nullable|required_with:password|same:password',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,jpg,gif|max:5120', // 5MB
         ];
     }
 
