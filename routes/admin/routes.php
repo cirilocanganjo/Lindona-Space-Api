@@ -12,4 +12,8 @@ Route::group(['middleware' => 'auth:api' ,'prefix' =>'admin', 'controller' => Ad
         Route::put('/employee/{id}', 'update');
         Route::delete('/employee/{id}', 'delete');
         Route::put('/change/user/status/{id}', 'changeUserStatus');
+
+        Route::get('/all/employees/counter','getAllEmployeesCounter');
+        Route::get('/all/active/employees/counter','getAllActiveEmployeesCounter');
+        Route::get('/all/inactive/employees/counter','getAllInactiveEmployeesCounter');
 });

@@ -89,4 +89,22 @@ class AdminController extends Controller
     {
         //
     }
+
+    public function getAllEmployeesCounter (): int
+    {
+      return User::query()->wherehas('funcionario')->count();
+    }
+   public function getAllActiveEmployeesCounter(): int
+    {
+        return User::query()
+            ->whereHas('funcionario', fn ($query) => $query->where('status', 1))
+            ->count();
+    }
+    public function getAllInactiveEmployeesCounter (): int
+    
+    {
+        return User::query()
+            ->whereHas('funcionario', fn ($query) => $query->where('status', 0))
+            ->count();
+    }
 }
