@@ -15,6 +15,7 @@ class Funcionario extends Model
         'email_funcionario',
         'senha_funcionario',
         'cargo',
-        'salario'
+        'salario',
+        'status'
     ];
 }
