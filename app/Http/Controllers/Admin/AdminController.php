@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -107,4 +108,34 @@ class AdminController extends Controller
             ->whereHas('funcionario', fn ($query) => $query->where('status', 0))
             ->count();
     }
+
+    public function changeUserStatus($id): JsonResponse
+   {
+    $user = User::query()->with('funcionario')->find($id);
+
+    if (!$user) {
+        return response()->json([
+            'message' => 'Utilizador não encontrado.'
+        ], 404);
+    }
+
+    if (!$user->funcionario) {
+        return response()->json([
+            'message' => 'Este utilizador não possui um registo de funcionário.'
+        ], 404);
+    }
+
+    DB::transaction(function () use ($user) {
+        $user->funcionario->update([
+            'status' => !$user->funcionario->status,
+        ]);
+    });
+
+    return response()->json([
+        'message' => 'O estado do funcionário foi atualizado com sucesso!',
+        'status' => (bool) $user->funcionario->fresh()->status,
+    ]);
+  }
+
+
 }
