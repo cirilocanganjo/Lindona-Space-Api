@@ -112,7 +112,7 @@ public function logout(Request $request): JsonResponse
 
 }
 
-public function getAuthenticatedUser ():JsonResponse
+public function getAuthenticatedUser (): JsonResponse
 {
     $user = auth()->user()->load('cliente');
 
