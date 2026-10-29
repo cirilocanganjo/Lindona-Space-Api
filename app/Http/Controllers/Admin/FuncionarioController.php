@@ -151,9 +151,34 @@ class FuncionarioController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        //
+   {
+    $user = User::query()->where('id', $id)->with(['funcionario'])->first();
+
+    if (!$user) {
+        return response()->json([
+            'message' => 'Funcionário não encontrado.'
+        ], 404);
     }
+
+    $employee = $user->funcionario;
+    $photoToDelete = $user->profile_photo;
+
+    try {
+        DB::transaction(function () use ($user, $employee) {            
+            $user->delete();
+        });
+
+    } catch (\Throwable $exception) {
+        return response()->json([
+            'message' => 'Ocorreu um erro ao realizar a operação.',
+            'error' => $exception->getMessage()
+        ], 500);
+    }    
+
+    return response()->json([
+        'message' => 'Funcionário removido com sucesso.'
+    ]);
+  }
 
       public function getAllEmployeesCounter (): int
     {

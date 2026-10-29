@@ -9,7 +9,7 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'admin', 'controller' => F
         Route::post('/employee', 'store');
         Route::get('/employee/{id}', 'show');
         Route::put('/employee/{id}', 'update');
-        Route::delete('/employee/{id}', 'delete');
+        Route::delete('/employee/{id}', 'destroy');
         Route::put('/change/user/status/{id}', 'changeUserStatus');
 
         Route::get('/all/employees/counter','getAllEmployeesCounter');
