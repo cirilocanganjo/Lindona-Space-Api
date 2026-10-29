@@ -69,23 +69,5 @@ class UpdateAuthenticatedUserRequest extends FormRequest
         ];
     }
 
-    /*
-
-
-    [
-        'name' => ['required', 'string', 'max:255'],
-        'email' => [
-            'required',
-            'email',
-            
-        ],
-        'phone' => ['required', 'string', 'max:30'],
-        'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        'password' => ['nullable', 'string', 'min:8'],
-    ]
     
-    
-    
-    
-    */
 }
