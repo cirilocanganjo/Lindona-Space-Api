@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Models\Funcionario;
 use Hash;
 use \Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
@@ -54,9 +56,35 @@ class FuncionarioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        //
+        $photo_name = null;
+
+    if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+        $photo = $request->file('photo');
+        $photo_name = Str::uuid() . '.' . $photo->extension();
+        $photo->storeAs('img', $photo_name, 'public');
+    }
+
+    DB::transaction(function () use ($request, $photo_name) {
+        $funcionario = Funcionario::create([
+            'nome_funcionario' => $request->input('name'),
+            'email_funcionario' => $request->input('email'),
+            'salario' => $request->input('salary'),
+            'cargo' => $request->input('role'),
+            'telefone_funcionario' => $request->input('phone'),
+            'senha_funcionario' => Hash::make($request->input('password')),
+        ]);
+
+        User::create([
+            'funcionario_id' => $funcionario->id,
+            'profile_photo' => $photo_name,
+        ]);
+    });
+
+    return response()->json([
+        'message' => 'Operação realizada com sucesso.',
+    ], 201);
     }
 
     /**
